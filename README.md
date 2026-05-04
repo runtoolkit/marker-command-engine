@@ -1,1 +1,72 @@
-# marker-command-engine
+# Marker Command Engine (MCE)
+
+[![Minecraft](https://img.shields.io/badge/Minecraft-1.21+-green)](https://minecraft.net)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+**Marker Command Engine** is a lightweight and high-performance command execution engine for Minecraft datapacks. It allows you to run commands directly from storage using a clean marker entity + command block technique.
+
+## Features
+
+- Execute commands stored in `storage mce:cmd`
+- Very low performance impact
+- Simple and clean API
+- Clean marker entity method
+- Supports Minecraft 1.21+ (`pack_format: 57`)
+
+## Installation
+
+1. Download or clone this repository.
+2. Put the `marker-command-engine` folder into your world's `datapacks` folder.
+3. Run `/reload` in your Minecraft world.
+4. You should see a successful load message in chat.
+
+## Usage
+
+### Run a Command
+
+```mcfunction
+# Store the command
+data modify storage mce:cmd Command set value "say Hello World!"
+
+# Execute it
+function mce:api/run
+```
+
+### Show Help
+
+```mcfunction
+function mce:api/help
+```
+
+## Available Functions
+
+| Function              | Description                                      |
+|-----------------------|--------------------------------------------------|
+| `mce:api/run`         | Executes the command stored in storage           |
+| `mce:api/help`        | Shows help information                           |
+| `mce:core/load`       | Runs when datapack is loaded                     |
+| `mce:core/reset`      | Cleans up marker and command block               |
+
+## Technical Details
+
+- **Marker**: Tagged with `Tags:["mce.cmd"]`
+- **Command Block**: Temporarily placed at `0 -64 0` and removed immediately
+- Reset operation runs automatically after 3 ticks
+
+## For Developers
+
+Storage structure:
+
+```json
+{
+  "Command": "your command here"
+}
+```
+
+## License
+
+This project is licensed under the **MIT License** — you are free to use, modify, and distribute.
+
+---
+
+**Made with ❤️ for the Minecraft Datapack Community**
