@@ -1,0 +1,10 @@
+{
+  "pack": {
+    "pack_format": 57,
+    "supported_formats": {
+      "max_inclusive": 61,
+      "min_inclusive": 8
+    },
+    "description": "§aMCE §7- Marker Command Engine"
+  }
+}
