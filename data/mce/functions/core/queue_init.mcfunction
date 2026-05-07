@@ -1,0 +1,1 @@
+execute unless score #mce.size mce.queue matches 0 if data storage mce:queue commands[0] run function mce:core/queue_run

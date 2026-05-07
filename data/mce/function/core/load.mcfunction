@@ -1,4 +1,6 @@
 forceload add 0 0
 
-say Marker Command Engine loaded successfully!
-tellraw @a ["",{"text":"[MCE] ","color":"aqua"},{"text":"Marker Command Engine loaded successfully!","color":"white"}]
+# Initialize queue scoreboard
+scoreboard objectives add mce.queue dummy
+
+tellraw @a ["",{"text":"[MCE] ","color":"aqua"},{"text":"Marker Command Engine v1.0.1 loaded!","color":"white"}]

@@ -1,2 +1,2 @@
-# Summon a command marker
-summon minecraft:marker ~ ~ ~ {Tags:["mce.cmd"],NoGravity:1b,Invisible:1b}
+# Summon the command marker (only if not already present)
+execute unless entity @e[type=minecraft:marker,tag=mce.cmd,limit=1] run summon minecraft:marker ~ ~ ~ {Tags:["mce.cmd"]}
