@@ -12,7 +12,7 @@
 - Simple and clean API
 - Clean marker entity method
 - Supports Minecraft 1.21+ (`pack_format: 57`)
-- / Support
+- `/` Support
 
 ## Installation
 
