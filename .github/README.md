@@ -1,5 +1,7 @@
 # Marker Command Engine (MCE)
 
+[![Minecraft](https://img.shields.io/badge/Minecraft-1.19+-green)](https://minecraft.net)
+[![Minecraft](https://img.shields.io/badge/Minecraft-1.20+-green)](https://minecraft.net)
 [![Minecraft](https://img.shields.io/badge/Minecraft-1.21+-green)](https://minecraft.net)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
@@ -13,6 +15,7 @@
 - Clean marker entity method
 - Supports Minecraft 1.21+ (`pack_format: 57`)
 - `/` Support
+- Batch & Queue system
 
 ## Installation
 
