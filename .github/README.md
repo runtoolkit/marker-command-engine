@@ -42,14 +42,15 @@ function mce:api/run
 function mce:api/help
 ```
 
-## Available Functions
+---
 
-| Function              | Description                                      |
-|-----------------------|--------------------------------------------------|
-| `mce:api/run`         | Executes the command stored in storage           |
-| `mce:api/help`        | Shows help information                           |
-| `mce:api/batch`        | Batch system                           |
-| `mce:api/queue_*`        | Queue system                           |
+| Available Functions  |
+|-----------------------|
+| `mce:api/run`         |
+| `mce:api/help`        |
+| `mce:api/batch`        |
+| `mce:api/queue_*`        |
+| `mce:api/run_as`        |
 
 ## Technical Details
 
