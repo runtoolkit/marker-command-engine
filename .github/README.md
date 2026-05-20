@@ -48,8 +48,8 @@ function mce:api/help
 |-----------------------|--------------------------------------------------|
 | `mce:api/run`         | Executes the command stored in storage           |
 | `mce:api/help`        | Shows help information                           |
-| `mce:core/load`       | Runs when datapack is loaded                     |
-| `mce:core/reset`      | Cleans up marker and command block               |
+| `mce:api/batch`        | Batch system                           |
+| `mce:api/queue_*`        | Queue system                           |
 
 ## Technical Details
 
