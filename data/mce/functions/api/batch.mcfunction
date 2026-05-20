@@ -1,0 +1,1 @@
+function mce:core/batch
