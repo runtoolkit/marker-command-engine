@@ -5,6 +5,11 @@
 [![Minecraft](https://img.shields.io/badge/Minecraft-1.21+-green)](https://minecraft.net)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
+---
+> A trusted command runtime/dependency framework for datapacks.
+Not designed as a sandbox.
+Use only with trusted packs and operators.
+---
 **Marker Command Engine** is a lightweight and high-performance command execution engine for Minecraft datapacks. It allows you to run commands directly from storage using a clean marker entity + command block technique.
 
 ## Features
