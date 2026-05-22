@@ -1,5 +1,5 @@
 {
-  "values": [
-    "mce:core/load"
-  ]
+    "values": [
+        "#load:_private/load"
+    ]
 }
