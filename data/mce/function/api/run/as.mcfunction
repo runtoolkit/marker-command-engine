@@ -1,11 +1,20 @@
 # PUBLIC API — mce:api/run/as
 # MCE version: 1.1.0
-# REQUIRES: Minecraft 1.20.2+ (uses function macros)
 #
-# Execute a command as a specific entity.
+# Execute a command as one or more tagged entities.
+# Does NOT require Minecraft 1.20.2+ (no macros used).
+#
 # Usage:
-#   data modify storage mce:cmd Command set value "say I am someone else!"
-#   data modify storage mce:cmd Executor set value "@a[name=Steve,limit=1]"
-#   function mce:api/run/as
+#   1. Tag the target entity:
+#      tag <selector> add mce.executor
+#   2. Set the command:
+#      data modify storage mce:cmd Command set value "say I am the executor!"
+#   3. Call this function:
+#      function mce:api/run/as
+#
+# Notes:
+#   - All entities tagged mce.executor will execute the command.
+#   - The mce.executor tag is removed automatically after execution.
+#   - The command runs at the executor entity's position (at @s).
 
 function mce:core/run/as_exec

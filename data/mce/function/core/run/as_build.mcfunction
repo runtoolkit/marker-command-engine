@@ -1,3 +1,3 @@
 # Private: not part of MCE public API — subject to change without notice
-# Macro: merges Executor + Command into wrapped "execute as ... run ..." command
-$data modify storage mce:cmd Command set value "execute as $(Executor) run $(Command)"
+# Legacy stub — was a macro function in older versions.
+# as_exec now handles executor logic directly without macros.
