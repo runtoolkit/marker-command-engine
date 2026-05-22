@@ -1,6 +1,6 @@
 # Marker Command Engine (MCE)
 
-[![Minecraft](https://img.shields.io/badge/Minecraft-1.20.1+-green)](https://minecraft.net)
+[![Minecraft](https://img.shields.io/badge/Minecraft-1.19.3--26.1.2-green)](https://minecraft.net)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![LanternLoad](https://img.shields.io/badge/LanternLoad-compatible-blue)](https://github.com/LanternMC/load)
 
@@ -14,17 +14,19 @@
 ## Features
 
 - Execute commands stored in `storage mce:cmd`
-- No macros required — compatible with Minecraft 1.20.1+
+- No macros required — compatible with Minecraft 1.19.3+
 - Low performance impact
 - Clean public API (`mce:api/*`) — internal functions are private
 - Batch & Queue system
 - MCE-managed scheduler (replaces `/schedule`, preserves entity context)
+- **Per-player cooldown system** — macro-free, scoreboard-based
 - **LanternLoad integrated** — other packs can depend on MCE with guaranteed load order
 - Versioned API (`load.status` score for dependency checks)
 
 ## Requirements
 
-- Minecraft **1.20.1+**
+- Minecraft **1.19.3+** (pack_format 10+)
+- `mce:api/cooldown/check` requires **1.20.2+** (`return` command)
 - LanternLoad is **bundled** — no separate installation needed
 
 ## Installation
@@ -83,6 +85,24 @@ data modify storage mce:cmd Delay set value 40
 function mce:api/schedule/run
 ```
 
+### Cooldown
+
+```mcfunction
+# Set a 5-second (100 tick) cooldown on @s
+data modify storage mce:cd Ticks set value 100
+function mce:api/cooldown/set
+
+# Check before running a command (requires 1.20.2+)
+execute as @s if function mce:api/cooldown/check run function ns:your/action
+
+# Get remaining ticks
+execute as @s run function mce:api/cooldown/get
+# Result → mce:output Cooldown.remaining
+
+# Clear cooldown immediately
+function mce:api/cooldown/clear
+```
+
 ### Help
 
 ```mcfunction
@@ -123,6 +143,15 @@ Only `mce:api/*` functions are part of the public API. All `mce:core/*` function
 |---|---|
 | `mce:api/batch/run` | Add `mce:batch commands` list to queue and run |
 | `mce:api/batch/clear` | Clear batch staging area without queuing |
+
+### `mce:api/cooldown/`
+
+| Function | Min Version | Description |
+|---|---|---|
+| `mce:api/cooldown/set` | 1.19.3+ | Set cooldown ticks for `@s` from `mce:cd Ticks` |
+| `mce:api/cooldown/check` | 1.20.2+ | Returns 1 if `@s` is ready, 0 if on cooldown |
+| `mce:api/cooldown/clear` | 1.19.3+ | Clear cooldown for `@s` immediately |
+| `mce:api/cooldown/get` | 1.19.3+ | Write remaining ticks to `mce:output Cooldown.remaining` |
 
 ### `mce:api/util/`
 
@@ -170,10 +199,22 @@ execute unless score mce load.status matches 1001000.. run return 0
 |---|---|---|---|
 | `mce:cmd` | `Command` | String | Command to execute |
 | `mce:cmd` | `Delay` | Int | Delay in ticks for `schedule/run` (min: 1) |
+| `mce:cd` | `Ticks` | Int | Cooldown duration in ticks for `cooldown/set` |
 | `mce:queue` | `commands` | List | Pending queue commands |
 | `mce:batch` | `commands` | List | Batch staging area |
 | `mce:schedule` | `jobs` | List | Scheduled job list |
 | `mce:config` | `debug` | Byte | Debug mode flag (`1b` = on) |
+| `mce:output` | `Cooldown.ready` | Byte | `1b` if `@s` is ready, `0b` if on cooldown |
+| `mce:output` | `Cooldown.remaining` | Int | Remaining cooldown ticks |
+
+## Scoreboard Reference
+
+| Objective | Description |
+|---|---|
+| `mce.queue` | Queue state |
+| `mce.tick` | Internal tick counters |
+| `mce.compat` | Compat system flags |
+| `mce.cd` | Per-player cooldown (remaining ticks, 0 = ready) |
 
 > **Note:** `mce:cmd Executor` is no longer used. Tag your target entity with `mce.executor` before calling `mce:api/run/as`.
 
