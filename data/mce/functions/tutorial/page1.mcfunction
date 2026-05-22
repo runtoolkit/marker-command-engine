@@ -1,0 +1,1 @@
+tellraw @s [{"text":"Marker Command Engine (MCE)\n","color":"gold","bold":true},{"text":"Minecraft 1.20.1 Tutorial\n\n","color":"yellow"},{"text":"This tutorial shows the public API in a clickable flow.\n\n","color":"white"},{"text":"[Next ▶]","color":"green","bold":true,"clickEvent":{"action":"run_command","value":"/function mce:tutorial/page2"}}]
