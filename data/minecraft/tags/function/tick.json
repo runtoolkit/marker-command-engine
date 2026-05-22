@@ -1,5 +1,5 @@
 {
     "values": [
-        "mce:core/schedule_tick"
+        "mce:core/schedule/tick"
     ]
 }
