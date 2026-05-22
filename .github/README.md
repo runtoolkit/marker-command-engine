@@ -24,7 +24,7 @@
 
 ## Requirements
 
-- Minecraft **1.20.2+** (function macros required for `mce:api/run_as`)
+- Minecraft **1.20.2+** (function macros required for `mce:api/run/as`)
 - LanternLoad is **bundled** — no separate installation needed
 
 ## Installation
@@ -34,13 +34,15 @@
 3. Run `/reload`.
 4. You should see `[MCE] Marker Command Engine v1.1.0 loaded!` in chat.
 
+---
+
 ## Usage
 
 ### Run a Command
 
 ```mcfunction
 data modify storage mce:cmd Command set value "say Hello World!"
-function mce:api/run
+function mce:api/run/cmd
 ```
 
 ### Run as Entity
@@ -48,62 +50,89 @@ function mce:api/run
 ```mcfunction
 data modify storage mce:cmd Command set value "say I am Steve!"
 data modify storage mce:cmd Executor set value "@a[name=Steve,limit=1]"
-function mce:api/run_as
+function mce:api/run/as
 ```
 
 ### Queue
 
 ```mcfunction
 data modify storage mce:cmd Command set value "say First!"
-function mce:api/queue_add
+function mce:api/queue/add
 data modify storage mce:cmd Command set value "say Second!"
-function mce:api/queue_add
-function mce:api/queue_run
+function mce:api/queue/add
+function mce:api/queue/run
 ```
 
 ### Batch
 
 ```mcfunction
 data modify storage mce:batch commands set value ["say One","say Two","say Three"]
-function mce:api/batch
+function mce:api/batch/run
 ```
 
-### Schedule (replaces /schedule — preserves @s context)
+### Schedule
 
 ```mcfunction
+# Replaces /schedule — preserves @s context
 data modify storage mce:cmd Command set value "say Delayed!"
 data modify storage mce:cmd Delay set value 40
-function mce:api/schedule
+function mce:api/schedule/run
 ```
 
 ### Help
 
 ```mcfunction
-function mce:api/help
+function mce:api/util/help
 ```
+
+---
 
 ## Public API
 
 Only `mce:api/*` functions are part of the public API. All `mce:core/*` functions are **private** and may change without notice.
 
+### `mce:api/run/`
+
 | Function | Description |
 |---|---|
-| `mce:api/run` | Execute command from `mce:cmd Command` immediately |
-| `mce:api/run_as` | Execute as entity (`mce:cmd Executor` + `Command`) |
-| `mce:api/queue_add` | Add command to queue |
-| `mce:api/queue_run` | Start executing the queue |
-| `mce:api/queue_clear` | Clear queue without executing |
-| `mce:api/batch` | Add `mce:batch commands` list to queue and run |
-| `mce:api/batch_clear` | Clear batch staging area |
-| `mce:api/schedule` | Schedule command after `mce:cmd Delay` ticks |
-| `mce:api/schedule_clear` | Cancel all pending scheduled jobs |
-| `mce:api/cancel` | Abort active command execution |
-| `mce:api/debug_toggle` | Toggle debug output |
-| `mce:api/help` | Print usage in chat |
+| `mce:api/run/cmd` | Execute command from `mce:cmd Command` immediately |
+| `mce:api/run/as` | Execute as entity (`mce:cmd Executor` + `Command`) — requires 1.20.2+ |
+
+### `mce:api/queue/`
+
+| Function | Description |
+|---|---|
+| `mce:api/queue/add` | Add `mce:cmd Command` to queue |
+| `mce:api/queue/run` | Start executing the queue (one command per 3 ticks) |
+| `mce:api/queue/clear` | Clear queue without executing |
+
+### `mce:api/schedule/`
+
+| Function | Description |
+|---|---|
+| `mce:api/schedule/run` | Schedule command after `mce:cmd Delay` ticks |
+| `mce:api/schedule/clear` | Cancel all pending scheduled jobs |
+
+### `mce:api/batch/`
+
+| Function | Description |
+|---|---|
+| `mce:api/batch/run` | Add `mce:batch commands` list to queue and run |
+| `mce:api/batch/clear` | Clear batch staging area without queuing |
+
+### `mce:api/util/`
+
+| Function | Description |
+|---|---|
+| `mce:api/util/cancel` | Abort active command execution (does not affect queue) |
+| `mce:api/util/debug_toggle` | Toggle debug output on/off |
+| `mce:api/util/help` | Print usage in chat |
+
+---
 
 ## Depending on MCE (LanternLoad)
 
-To make your pack depend on MCE, add your load function to `#load:post_load` and check the version score:
+To make your pack load after MCE, add your load function to `#load:post_load` and verify the version score:
 
 ```json
 // data/yourpack/tags/function/post_load.json
@@ -114,12 +143,14 @@ To make your pack depend on MCE, add your load function to `#load:post_load` and
 
 ```mcfunction
 # yourpack:load
-# Require MCE v1.1.0 or newer (score: major*1000000 + minor*1000 + patch)
+# Require MCE v1.1.0+ (score format: major*1000000 + minor*1000 + patch)
 execute unless score mce load.status matches 1001000.. run tellraw @a {"text":"[YourPack] ERROR: MCE v1.1.0+ required!","color":"red"}
 execute unless score mce load.status matches 1001000.. run return 0
 
-# Your actual init here...
+# Your init here...
 ```
+
+---
 
 ## Technical Details
 
@@ -134,12 +165,14 @@ execute unless score mce load.status matches 1001000.. run return 0
 | Storage | Key | Type | Description |
 |---|---|---|---|
 | `mce:cmd` | `Command` | String | Command to execute |
-| `mce:cmd` | `Executor` | String | Entity selector for `run_as` |
-| `mce:cmd` | `Delay` | Int | Delay in ticks for `schedule` |
+| `mce:cmd` | `Executor` | String | Entity selector for `run/as` |
+| `mce:cmd` | `Delay` | Int | Delay in ticks for `schedule/run` |
 | `mce:queue` | `commands` | List | Pending queue commands |
 | `mce:batch` | `commands` | List | Batch staging area |
 | `mce:schedule` | `jobs` | List | Scheduled job list |
-| `mce:config` | `debug` | Byte | Debug mode flag |
+| `mce:config` | `debug` | Byte | Debug mode flag (`1b` = on) |
+
+---
 
 ## License
 
