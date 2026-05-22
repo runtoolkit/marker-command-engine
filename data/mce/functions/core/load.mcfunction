@@ -5,7 +5,11 @@ forceload add 0 0
 
 scoreboard objectives add mce.queue dummy
 scoreboard objectives add mce.tick dummy
+scoreboard objectives add mce.compat dummy
+
 scoreboard players set #tick mce.tick 0
+scoreboard players set #queue.active mce.compat 0
+scoreboard players set #sched.exists mce.compat 0
 
 # LanternLoad: advertise MCE version
 # v1.1.0 -> 1001000
