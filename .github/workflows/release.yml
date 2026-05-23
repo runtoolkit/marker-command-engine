@@ -1,0 +1,51 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Package & release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract version from tag
+        id: version
+        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Build datapack zip
+        run: |
+          VERSION="${{ steps.version.outputs.VERSION }}"
+          ZIP_NAME="marker-command-engine-v${VERSION}.zip"
+          echo "Building $ZIP_NAME..."
+          zip -r "$ZIP_NAME" \
+            data/ \
+            pack.mcmeta \
+            pack.png \
+            LICENSE \
+            -x "*.git*"
+          echo "ZIP_NAME=$ZIP_NAME" >> "$GITHUB_ENV"
+          echo "Built: $(du -h $ZIP_NAME | cut -f1) — $ZIP_NAME"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "Marker Command Engine v${{ steps.version.outputs.VERSION }}"
+          tag_name: ${{ github.ref_name }}
+          draft: false
+          prerelease: ${{ contains(github.ref_name, '-') }}
+          body: |
+            ## Marker Command Engine v${{ steps.version.outputs.VERSION }}
+
+            ### Installation
+            Drop the zip into your world's `datapacks/` folder.
+
+            ### Changelog
+            See [CHANGELOG](https://github.com/${{ github.repository }}/commits/${{ github.ref_name }}) for commit history.
+          files: ${{ env.ZIP_NAME }}

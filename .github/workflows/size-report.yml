@@ -1,0 +1,52 @@
+name: Size Report
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  size:
+    name: Datapack size report
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Count functions & tags
+        run: |
+          echo "## Datapack stats" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          FUNC_COUNT=$(find data/ -name "*.mcfunction" | wc -l)
+          JSON_COUNT=$(find data/ -name "*.json" | wc -l)
+          TOTAL_LINES=$(find data/ -name "*.mcfunction" -exec cat {} \; | wc -l)
+          CODE_LINES=$(find data/ -name "*.mcfunction" -exec grep -v "^#\|^$" {} \; | wc -l)
+          COMMENT_LINES=$(find data/ -name "*.mcfunction" -exec grep "^#" {} \; | wc -l)
+          DATA_SIZE=$(du -sh data/ | cut -f1)
+
+          echo "| Metric | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| mcfunction files | $FUNC_COUNT |" >> $GITHUB_STEP_SUMMARY
+          echo "| JSON files | $JSON_COUNT |" >> $GITHUB_STEP_SUMMARY
+          echo "| Total lines | $TOTAL_LINES |" >> $GITHUB_STEP_SUMMARY
+          echo "| Code lines | $CODE_LINES |" >> $GITHUB_STEP_SUMMARY
+          echo "| Comment lines | $COMMENT_LINES |" >> $GITHUB_STEP_SUMMARY
+          echo "| data/ size | $DATA_SIZE |" >> $GITHUB_STEP_SUMMARY
+
+          echo "Functions: $FUNC_COUNT | JSON: $JSON_COUNT | Code lines: $CODE_LINES"
+
+      - name: Check PR diff for new bare player names
+        run: |
+          BASE="${{ github.event.pull_request.base.sha }}"
+          git diff "$BASE"...HEAD -- 'data/**/*.mcfunction' | \
+            grep "^+" | grep -v "^+++" | \
+            grep -E "\+.*scoreboard players [a-z]+ [a-z]+ " | \
+            grep -vE "#[a-z]" > /tmp/bare_names.txt || true
+
+          if [ -s /tmp/bare_names.txt ]; then
+            echo "::warning::New lines may be missing # prefix on scoreboard fake-player names:"
+            cat /tmp/bare_names.txt
+          else
+            echo "No suspicious bare player names in diff."
+          fi
