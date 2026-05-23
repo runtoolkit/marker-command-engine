@@ -1,7 +1,7 @@
 # PUBLIC API — mce:api/util/help
-# MCE version: 2.1.0
+# MCE version: 2.0.1
 
-tellraw @s ["",{"text":"=== MCE v2.1.0 ===","color":"gold"}]
+tellraw @s ["",{"text":"=== MCE v2.0.1 ===","color":"gold"}]
 tellraw @s ["",{"text":"--- Run ---","color":"yellow"}]
 tellraw @s ["",{"text":" data modify storage mce:cmd Command set value \"<cmd>\"","color":"white"}]
 tellraw @s ["",{"text":" function mce:api/run/cmd","color":"gray"}]
@@ -46,3 +46,15 @@ tellraw @s ["",{"text":" function mce:api/util/version","color":"gray"}]
 tellraw @s ["",{"text":" function mce:api/util/announce_times (preset: fast/normal/slow/instant)","color":"gray"}]
 tellraw @s ["",{"text":" function mce:api/util/cancel","color":"gray"}]
 tellraw @s ["",{"text":" function mce:api/util/debug_toggle","color":"gray"}]
+tellraw @s ["",{"text":"--- Broadcast ---","color":"yellow"}]
+tellraw @s ["",{"text":" data modify storage mce:broadcast Prefix set value \"[Tag]\"","color":"white"}]
+tellraw @s ["",{"text":" data modify storage mce:broadcast Msg set value \"<text>\"","color":"white"}]
+tellraw @s ["",{"text":" function mce:api/util/broadcast (Prefix optional)","color":"gray"}]
+tellraw @s ["",{"text":"--- Log ---","color":"yellow"}]
+tellraw @s ["",{"text":" data modify storage mce:cmd Command set value \"<cmd>\"","color":"white"}]
+tellraw @s ["",{"text":" function mce:api/util/log  -> mce:log entries (last 10)","color":"gray"}]
+tellraw @s ["",{"text":"--- Error Handling ---","color":"yellow"}]
+tellraw @s ["",{"text":" data get storage mce:error Last","color":"white"}]
+tellraw @s ["",{"text":" data get storage mce:error Code","color":"white"}]
+tellraw @s ["",{"text":" data get storage mce:error Count","color":"white"}]
+tellraw @s ["",{"text":" (errors logged on bad API calls; enable debug for live output)","color":"gray"}]

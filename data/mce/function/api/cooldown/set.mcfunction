@@ -1,5 +1,5 @@
 # PUBLIC API — mce:api/cooldown/set
-# MCE version: 1.1.0
+# MCE version: 1.1.0 (extended)
 #
 # Sets a cooldown for the executor (@s).
 # Macro-free. Compatible with Minecraft 1.19.3+.
@@ -10,6 +10,11 @@
 # Usage:
 #   data modify storage mce:cd Ticks set value 100
 #   function mce:api/cooldown/set
+
+execute unless data storage mce:cd Ticks run data modify storage mce:error Last set value "mce:cd Ticks is not set — provide a tick count before calling cooldown/set"
+execute unless data storage mce:cd Ticks run data modify storage mce:error Code set value "ERR_NO_TICKS"
+execute unless data storage mce:cd Ticks run function mce:core/error/raise
+execute unless data storage mce:cd Ticks run return 0
 
 execute store result score @s mce.cd run data get storage mce:cd Ticks
 data remove storage mce:cd Ticks
