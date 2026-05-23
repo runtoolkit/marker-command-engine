@@ -20,7 +20,7 @@ tellraw @s ["",{"text":" data modify storage mce:multi Title set value '{\"text\
 tellraw @s ["",{"text":" data modify storage mce:multi Subtitle set value '{\"text\":\"<subtitle>\"}'","color":"white"}]
 tellraw @s ["",{"text":" data modify storage mce:multi Actionbar set value '{\"text\":\"<text>\"}'","color":"white"}]
 tellraw @s ["",{"text":" data modify storage mce:multi Msg set value '{\"text\":\"<message>\"}'","color":"white"}]
-tellraw @s ["",{"text":" data modify storage mce:multi Cmd set value \"<cmd>\"","color":"white"}]
+tellraw @s ["",{"text":" data modify storage mce:multi Cmds set value ["<cmd1>","<cmd2>"]","color":"white"}]
 tellraw @s ["",{"text":" function mce:api/multi/run (all keys optional)","color":"gray"}]
 tellraw @s ["",{"text":"--- Queue ---","color":"yellow"}]
 tellraw @s ["",{"text":" data modify storage mce:cmd Command set value \"<cmd>\"","color":"white"}]
