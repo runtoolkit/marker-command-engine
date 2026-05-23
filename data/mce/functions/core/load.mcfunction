@@ -16,7 +16,7 @@ scoreboard players set #sched.exists mce.compat 0
 execute unless data storage mce:config {debug:1b} run data modify storage mce:config debug set value 0b
 
 # LanternLoad: advertise MCE version
-# v1.1.0 -> 1001000
-scoreboard players set #mce load.status 1001000
+# v2.0.0 -> 2000000
+scoreboard players set #mce load.status 2000000
 
-tellraw @a ["",{"text":"[MCE] ","color":"aqua"},{"text":"Marker Command Engine v1.1.0 loaded!","color":"white"}]
+tellraw @a ["",{"text":"[MCE] ","color":"aqua"},{"text":"Marker Command Engine v2.0.0 loaded!","color":"white"}]
