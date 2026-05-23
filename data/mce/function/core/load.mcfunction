@@ -12,11 +12,27 @@ scoreboard players set #tick mce.tick 0
 scoreboard players set #queue.active mce.compat 0
 scoreboard players set #sched.exists mce.compat 0
 
-# Initialize debug flag (default: off)
-execute unless data storage mce:config {debug:1b} run data modify storage mce:config debug set value 0b
+# --- MCE Config (mce.*) ---
+# Internal MCE settings. Do not modify unless you know what you are doing.
 
-# LanternLoad: advertise MCE version
-# v2.0.0 -> 2000000
-scoreboard players set #mce load.status 2000000
+# mce.debug: debug output toggle (0b = off, 1b = on)
+execute unless data storage mce:config {mce:{debug:1b}} run data modify storage mce:config mce.debug set value 0b
 
-tellraw @a ["",{"text":"[MCE] ","color":"aqua"},{"text":"Marker Command Engine v2.0.0 loaded!","color":"white"}]
+# mce.version: human-readable version string (set on every load)
+data modify storage mce:config mce.version set value "2.1.0"
+
+# mce.queue_interval: ticks between queue executions (read-only reference, hardcoded in core/queue/tick)
+data modify storage mce:config mce.queue_interval set value 3
+
+# --- API Config (api.*) ---
+# Settings exposed for other packs to read and optionally override.
+
+# api.announce_default_preset: default timing preset used by mce:api/util/announce_times
+# Valid values: "fast" (5/30/5), "normal" (10/70/20), "slow" (20/100/20), "instant" (0/40/0)
+execute unless data storage mce:config api.announce_default_preset run data modify storage mce:config api.announce_default_preset set value "normal"
+
+# --- LanternLoad: advertise MCE version ---
+# v2.1.0 -> 2001000
+scoreboard players set #mce load.status 2001000
+
+tellraw @a ["",{"text":"[MCE] ","color":"aqua"},{"text":"Marker Command Engine v2.1.0 loaded!","color":"white"}]
