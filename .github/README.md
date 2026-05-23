@@ -5,7 +5,7 @@
 [![LanternLoad](https://img.shields.io/badge/LanternLoad-compatible-blue)](https://github.com/LanternMC/load)
 
 ---
-> A trusted command runtime/dependency framework for datapacks.  
+> A trusted command runtime/dependency framework for datapacks.
 > Not designed as a sandbox. Use only with trusted packs and operators.
 ---
 
@@ -20,6 +20,9 @@
 - Batch & Queue system
 - MCE-managed scheduler (replaces `/schedule`, preserves entity context)
 - **Per-player cooldown system** — macro-free, scoreboard-based
+- **Run at fixed world coordinates** — execute commands from any integer coordinate
+- **Announce system** — title, subtitle, and actionbar in a single call
+- **Version query API** — check MCE version from storage at runtime
 - **LanternLoad integrated** — other packs can depend on MCE with guaranteed load order
 - Versioned API (`load.status` score for dependency checks)
 
@@ -34,7 +37,7 @@
 1. Download the latest release zip.
 2. Place the `marker-command-engine` folder into your world's `datapacks/` folder.
 3. Run `/reload`.
-4. You should see `[MCE] Marker Command Engine v1.1.0 loaded!` in chat.
+4. You should see `[MCE] Marker Command Engine v2.0.0 loaded!` in chat.
 
 ---
 
@@ -58,6 +61,19 @@ data modify storage mce:cmd Command set value "say I am Steve!"
 function mce:api/run/as
 # mce.executor tag is removed automatically
 ```
+
+### Run at Coordinates
+
+```mcfunction
+# Execute a command from a fixed world position
+data modify storage mce:cmd Command set value "say Hello from coords!"
+data modify storage mce:cmd AtX set value 0
+data modify storage mce:cmd AtY set value 64
+data modify storage mce:cmd AtZ set value 0
+function mce:api/run/at
+```
+
+All three coordinates (AtX, AtY, AtZ) must be set before calling. Values are integers.
 
 ### Queue
 
@@ -97,10 +113,41 @@ execute as @s if function mce:api/cooldown/check run function ns:your/action
 
 # Get remaining ticks
 execute as @s run function mce:api/cooldown/get
-# Result → mce:output Cooldown.remaining
+# Result -> mce:output Cooldown.remaining
 
 # Clear cooldown immediately
 function mce:api/cooldown/clear
+```
+
+### Announce
+
+```mcfunction
+# Send title, subtitle, and/or actionbar in a single call.
+# All three keys are optional — omit any to skip that slot.
+data modify storage mce:announce Title set value "Welcome!"
+data modify storage mce:announce Subtitle set value "Enjoy your stay."
+data modify storage mce:announce Actionbar set value "Server online"
+function mce:api/util/announce
+```
+
+With custom timing (call before announce):
+
+```mcfunction
+# Presets: fast (5/30/5), normal (10/70/20), slow (20/100/20), instant (0/40/0)
+data modify storage mce:announce_times Preset set value "fast"
+function mce:api/util/announce_times
+
+data modify storage mce:announce Title set value "Go!"
+function mce:api/util/announce
+```
+
+### Version
+
+```mcfunction
+# Prints version to chat and writes to storage.
+function mce:api/util/version
+# mce:output Version.string -> "2.0.0"
+# mce:output Version.numeric -> 2000000
 ```
 
 ### Help
@@ -121,6 +168,7 @@ Only `mce:api/*` functions are part of the public API. All `mce:core/*` function
 |---|---|
 | `mce:api/run/cmd` | Execute command from `mce:cmd Command` immediately |
 | `mce:api/run/as` | Execute as tagged entities (`mce.executor` tag + `mce:cmd Command`) |
+| `mce:api/run/at` | Execute command from fixed coordinates (`mce:cmd AtX/AtY/AtZ`) |
 
 ### `mce:api/queue/`
 
@@ -157,6 +205,9 @@ Only `mce:api/*` functions are part of the public API. All `mce:core/*` function
 
 | Function | Description |
 |---|---|
+| `mce:api/util/announce` | Send title/subtitle/actionbar from `mce:announce` storage |
+| `mce:api/util/announce_times` | Set title timing preset from `mce:announce_times Preset` |
+| `mce:api/util/version` | Print MCE version and write to `mce:output Version` |
 | `mce:api/util/cancel` | Abort active command execution (does not affect queue) |
 | `mce:api/util/debug_toggle` | Toggle debug output on/off |
 | `mce:api/util/help` | Print usage in chat |
@@ -176,9 +227,9 @@ To make your pack load after MCE, add your load function to `#load:post_load` an
 
 ```mcfunction
 # yourpack:load
-# Require MCE v1.1.0+ (score format: major*1000000 + minor*1000 + patch)
-execute unless score mce load.status matches 1001000.. run tellraw @a {"text":"[YourPack] ERROR: MCE v1.1.0+ required!","color":"red"}
-execute unless score mce load.status matches 1001000.. run return 0
+# Require MCE v2.0.0+ (score format: major*1000000 + minor*1000 + patch)
+execute unless score mce load.status matches 2000000.. run tellraw @a {"text":"[YourPack] ERROR: MCE v2.0.0+ required!","color":"red"}
+execute unless score mce load.status matches 2000000.. run return 0
 
 # Your init here...
 ```
@@ -191,7 +242,7 @@ execute unless score mce load.status matches 1001000.. run return 0
 - **Command block position**: `0 -64 0`
 - **Reset delay**: 3 ticks after execution
 - **Queue interval**: 3 ticks between commands
-- **Version score**: `mce load.status` = `1001000` (v1.1.0)
+- **Version score**: `mce load.status` = `2000000` (v2.0.0)
 
 ## Storage Reference
 
@@ -199,13 +250,22 @@ execute unless score mce load.status matches 1001000.. run return 0
 |---|---|---|---|
 | `mce:cmd` | `Command` | String | Command to execute |
 | `mce:cmd` | `Delay` | Int | Delay in ticks for `schedule/run` (min: 1) |
+| `mce:cmd` | `AtX` | Int | X coordinate for `run/at` |
+| `mce:cmd` | `AtY` | Int | Y coordinate for `run/at` |
+| `mce:cmd` | `AtZ` | Int | Z coordinate for `run/at` |
 | `mce:cd` | `Ticks` | Int | Cooldown duration in ticks for `cooldown/set` |
 | `mce:queue` | `commands` | List | Pending queue commands |
 | `mce:batch` | `commands` | List | Batch staging area |
 | `mce:schedule` | `jobs` | List | Scheduled job list |
 | `mce:config` | `debug` | Byte | Debug mode flag (`1b` = on) |
+| `mce:announce` | `Title` | String | Title text for `util/announce` |
+| `mce:announce` | `Subtitle` | String | Subtitle text for `util/announce` |
+| `mce:announce` | `Actionbar` | String | Actionbar text for `util/announce` |
+| `mce:announce_times` | `Preset` | String | Timing preset: `fast` `normal` `slow` `instant` |
 | `mce:output` | `Cooldown.ready` | Byte | `1b` if `@s` is ready, `0b` if on cooldown |
 | `mce:output` | `Cooldown.remaining` | Int | Remaining cooldown ticks |
+| `mce:output` | `Version.string` | String | MCE version string (e.g. `"2.0.0"`) |
+| `mce:output` | `Version.numeric` | Int | MCE version as int (e.g. `2000000`) |
 
 ## Scoreboard Reference
 
@@ -217,6 +277,21 @@ execute unless score mce load.status matches 1001000.. run return 0
 | `mce.cd` | Per-player cooldown (remaining ticks, 0 = ready) |
 
 > **Note:** `mce:cmd Executor` is no longer used. Tag your target entity with `mce.executor` before calling `mce:api/run/as`.
+
+---
+
+## Changelog
+
+### v2.0.0
+- Added `mce:api/run/at` — execute commands from fixed world coordinates
+- Added `mce:api/util/announce` — send title, subtitle, actionbar in one call
+- Added `mce:api/util/announce_times` — configure title timing via presets
+- Added `mce:api/util/version` — query MCE version at runtime
+- Updated `mce:api/util/help` with all new APIs
+- Bumped LanternLoad version score to `2000000`
+
+### v1.1.0
+- Initial public release
 
 ---
 
