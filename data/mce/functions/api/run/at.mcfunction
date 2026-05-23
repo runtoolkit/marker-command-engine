@@ -7,16 +7,16 @@
 # Compatible with Minecraft 1.20.1+
 #
 # Input:
-#   mce:cmd Command — string, the command to execute
-#   mce:cmd AtX     — int, X coordinate
-#   mce:cmd AtY     — int, Y coordinate
-#   mce:cmd AtZ     — int, Z coordinate
+# mce:cmd Command — string, the command to execute
+# mce:cmd AtX — int, X coordinate
+# mce:cmd AtY — int, Y coordinate
+# mce:cmd AtZ — int, Z coordinate
 #
 # Usage:
-#   data modify storage mce:cmd Command set value "say Hi from coords!"
-#   data modify storage mce:cmd AtX set value 0
-#   data modify storage mce:cmd AtY set value 64
-#   data modify storage mce:cmd AtZ set value 0
-#   function mce:api/run/at
+# data modify storage mce:cmd Command set value "say Hi from coords!"
+# data modify storage mce:cmd AtX set value 0
+# data modify storage mce:cmd AtY set value 64
+# data modify storage mce:cmd AtZ set value 0
+# function mce:api/run/at
 
 function mce:core/run/at_build
