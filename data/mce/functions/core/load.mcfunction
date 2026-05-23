@@ -17,6 +17,6 @@ execute unless data storage mce:config {debug:1b} run data modify storage mce:co
 
 # LanternLoad: advertise MCE version
 # v1.1.0 -> 1001000
-scoreboard players set mce load.status 1001000
+scoreboard players set #mce load.status 1001000
 
 tellraw @a ["",{"text":"[MCE] ","color":"aqua"},{"text":"Marker Command Engine v1.1.0 loaded!","color":"white"}]
