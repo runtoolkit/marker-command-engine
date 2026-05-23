@@ -6,24 +6,24 @@
 # Execution order: title -> subtitle -> actionbar -> msg -> cmd
 #
 # Inputs (all optional):
-#   mce:multi Title     — string, raw JSON text component for title
-#   mce:multi Subtitle  — string, raw JSON text component for subtitle
-#   mce:multi Actionbar — string, raw JSON text component for actionbar
-#   mce:multi Msg       — string, raw JSON text component sent via tellraw
-#   mce:multi Cmd       — string, command to execute via mce:api/run/cmd
+# mce:multi Title — string, raw JSON text component for title
+# mce:multi Subtitle — string, raw JSON text component for subtitle
+# mce:multi Actionbar — string, raw JSON text component for actionbar
+# mce:multi Msg — string, raw JSON text component sent via tellraw
+# mce:multi Cmd — string, command to execute via mce:api/run/cmd
 #
 # For plain text (no formatting):
-#   data modify storage mce:multi Title set value '{"text":"Hello!"}'
+# data modify storage mce:multi Title set value '{"text":"Hello!"}'
 #
 # For styled text:
-#   data modify storage mce:multi Title set value '{"text":"Hello!","color":"gold","bold":true}'
+# data modify storage mce:multi Title set value '{"text":"Hello!","color":"gold","bold":true}'
 #
 # Usage:
-#   data modify storage mce:multi Title set value '{"text":"Welcome!","color":"gold"}'
-#   data modify storage mce:multi Subtitle set value '{"text":"Good luck.","color":"gray"}'
-#   data modify storage mce:multi Msg set value '{"text":"[Server] Game starting!","color":"aqua"}'
-#   data modify storage mce:multi Cmd set value "function ns:game/start"
-#   function mce:api/multi/run
+# data modify storage mce:multi Title set value '{"text":"Welcome!","color":"gold"}'
+# data modify storage mce:multi Subtitle set value '{"text":"Good luck.","color":"gray"}'
+# data modify storage mce:multi Msg set value '{"text":"[Server] Game starting!","color":"aqua"}'
+# data modify storage mce:multi Cmd set value "function ns:game/start"
+# function mce:api/multi/run
 
 execute if data storage mce:multi Title run title @s title {"storage":"mce:multi","nbt":"Title","interpret":true}
 execute if data storage mce:multi Subtitle run title @s subtitle {"storage":"mce:multi","nbt":"Subtitle","interpret":true}

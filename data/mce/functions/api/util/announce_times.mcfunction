@@ -5,24 +5,24 @@
 # Call this BEFORE mce:api/util/announce if you want non-default timing.
 #
 # Presets (fadeIn / stay / fadeOut ticks):
-#   fast    : 5 / 30 / 5
-#   normal  : 10 / 70 / 20 (Minecraft default)
-#   slow    : 20 / 100 / 20
-#   instant : 0 / 40 / 0
+# fast : 5 / 30 / 5
+# normal : 10 / 70 / 20 (Minecraft default)
+# slow : 20 / 100 / 20
+# instant : 0 / 40 / 0
 #
 # Input:
-#   mce:announce_times Preset — string, one of the presets above.
-#   Omit to use the value of mce:config api.announce_default_preset (default: "normal").
+# mce:announce_times Preset — string, one of the presets above.
+# Omit to use the value of mce:config api.announce_default_preset (default: "normal").
 #
 # Usage:
-#   data modify storage mce:announce_times Preset set value "fast"
-#   function mce:api/util/announce_times
+# data modify storage mce:announce_times Preset set value "fast"
+# function mce:api/util/announce_times
 
 # Fall back to config default if no preset supplied
 execute unless data storage mce:announce_times Preset run data modify storage mce:announce_times Preset set from storage mce:config api.announce_default_preset
 
-execute if data storage mce:announce_times {Preset:"fast"}    run title @s times 5 30 5
-execute if data storage mce:announce_times {Preset:"slow"}    run title @s times 20 100 20
+execute if data storage mce:announce_times {Preset:"fast"} run title @s times 5 30 5
+execute if data storage mce:announce_times {Preset:"slow"} run title @s times 20 100 20
 execute if data storage mce:announce_times {Preset:"instant"} run title @s times 0 40 0
 execute unless data storage mce:announce_times {Preset:"fast"} unless data storage mce:announce_times {Preset:"slow"} unless data storage mce:announce_times {Preset:"instant"} run title @s times 10 70 20
 
