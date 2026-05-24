@@ -1,6 +1,6 @@
 # Marker Command Engine - Macro-free Command Framework
 
-[![Minecraft](https://img.shields.io/badge/Minecraft-1.20--26.1.2-green)](https://minecraft.net)
+[![Minecraft](https://img.shields.io/badge/Minecraft-1.19.3%2B-green)](https://minecraft.net)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![LanternLoad](https://img.shields.io/badge/LanternLoad-compatible-blue)](https://github.com/LanternMC/load)
 
@@ -30,7 +30,7 @@
 ## Requirements
 
 - Minecraft **1.19.3+** (pack_format 10+)
-- `mce:api/cooldown/check` requires **1.20.2+** (`return` command)
+- All functions compatible with **1.19.3+** (no `return` command used)
 - LanternLoad is **bundled** — no separate installation needed
 
 ## Installation
@@ -221,12 +221,20 @@ Only `mce:api/*` functions are part of the public API. All `mce:core/*` function
 | `mce:api/batch/run` | Add `mce:batch commands` list to queue and run |
 | `mce:api/batch/clear` | Clear batch staging area without queuing |
 
+
+### `mce:api/text/batch/`
+
+| Function | Description |
+|---|---|
+| `mce:api/text/batch/run` | Send all entries in `mce:text_batch entries` (tellraw / title / actionbar) |
+| `mce:api/text/batch/clear` | Clear `mce:text_batch entries` without sending |
+
 ### `mce:api/cooldown/`
 
 | Function | Min Version | Description |
 |---|---|---|
 | `mce:api/cooldown/set` | 1.19.3+ | Set cooldown ticks for `@s` from `mce:cd Ticks` |
-| `mce:api/cooldown/check` | 1.20.2+ | Returns 1 if `@s` is ready, 0 if on cooldown |
+| `mce:api/cooldown/check` | 1.19.3+ | Sets `mce:output Cooldown.ready` (1b=ready, 0b=on cooldown) |
 | `mce:api/cooldown/clear` | 1.19.3+ | Clear cooldown for `@s` immediately |
 | `mce:api/cooldown/get` | 1.19.3+ | Write remaining ticks to `mce:output Cooldown.remaining` |
 
@@ -272,8 +280,8 @@ To make your pack load after MCE, add your load function to `#load:post_load` an
 ```mcfunction
 # yourpack:load
 # Require MCE v2.2.0+ (score format: major*1000000 + minor*1000 + patch)
-execute unless score mce load.status matches 2002000.. run tellraw @a {"text":"[YourPack] ERROR: MCE v2.2.0+ required!","color":"red"}
-execute unless score mce load.status matches 2002000.. run return 0
+execute unless score mce load.status matches 2003000.. run tellraw @a {"text":"[YourPack] ERROR: MCE v2.2.0+ required!","color":"red"}
+execute unless score mce load.status matches 2003000.. run tellraw @a {"text":"[YourPack] Aborting: MCE v2.3.0+ required.","color":"red"}
 
 # Your init here...
 ```
@@ -286,7 +294,7 @@ execute unless score mce load.status matches 2002000.. run return 0
 - **Command block position**: `0 -64 0`
 - **Reset delay**: 3 ticks after execution
 - **Queue interval**: 3 ticks between commands
-- **Version score**: `mce load.status` = `2002000` (v2.2.0)
+- **Version score**: `mce load.status` = `2003000` (v2.3.0)
 
 ## Storage Reference
 
@@ -300,6 +308,7 @@ execute unless score mce load.status matches 2002000.. run return 0
 | `mce:cd` | `Ticks` | Int | Cooldown duration in ticks for `cooldown/set` |
 | `mce:queue` | `commands` | List | Pending queue commands |
 | `mce:batch` | `commands` | List | Batch staging area |
+| `mce:text_batch` | `entries` | List | Text batch entries: `{type, target, msg?, prefix?, title?, subtitle?, preset?}` |
 | `mce:schedule` | `jobs` | List | Scheduled job list |
 | `mce:config` | `mce.debug` | Byte | Debug mode flag (`1b` = on) |
 | `mce:config` | `mce.version` | String | MCE version string |
@@ -312,7 +321,7 @@ execute unless score mce load.status matches 2002000.. run return 0
 | `mce:log` | `entries` | List | Log entries: `{n, lvl, msg}` (max 64) |
 | `mce:broadcast` | `Msg` | String | Message text for `util/broadcast` |
 | `mce:broadcast` | `Prefix` | String | Optional prefix for `util/broadcast` |
-| `mce:output` | `Cooldown.ready` | Byte | `1b` if `@s` is ready, `0b` if on cooldown |
+| `mce:output` | `Cooldown.ready` | Byte | `1b` if `@s` is ready, `0b` if on cooldown — set by `cooldown/check` |
 | `mce:output` | `Cooldown.remaining` | Int | Remaining cooldown ticks |
 | `mce:output` | `Version.string` | String | MCE version string (e.g. `"2.2.0"`) |
 | `mce:output` | `Version.numeric` | Int | MCE version as int (e.g. `2002000`) |
@@ -335,6 +344,14 @@ execute unless score mce load.status matches 2002000.. run return 0
 ---
 
 ## Changelog
+
+### v2.3.0
+- **Breaking:** `mce:api/cooldown/check` no longer supports `execute if function` syntax — use `mce:output Cooldown.ready` instead
+- Removed all `return` commands — fully compatible with Minecraft 1.19.3+
+- Added `mce:api/text/batch/run` — send multiple tellraw/title/actionbar messages in a single call
+- Added `mce:api/text/batch/clear` — clear pending text batch without sending
+- Updated Requirements: all APIs now 1.19.3+ (no exceptions)
+
 
 ### v2.2.0
 - Added `mce:api/log/write` — structured log entries `{n, lvl, msg}`, 64-entry cap
