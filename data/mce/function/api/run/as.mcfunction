@@ -2,7 +2,7 @@
 # MCE version: 1.1.0 (extended)
 #
 # Execute a command as one or more tagged entities.
-# Does NOT require Minecraft 1.20.2+ (no macros used).
+# Compatible with Minecraft 1.19.3+
 #
 # Usage:
 #   1. Tag the target entity:
@@ -20,11 +20,9 @@
 execute unless data storage mce:cmd Command run data modify storage mce:error Last set value "mce:cmd Command is not set"
 execute unless data storage mce:cmd Command run data modify storage mce:error Code set value "ERR_NO_CMD"
 execute unless data storage mce:cmd Command run function mce:core/error/raise
-execute unless data storage mce:cmd Command run return 0
 
-execute unless entity @e[tag=mce.executor,limit=1] run data modify storage mce:error Last set value "no entity tagged mce.executor — tag a target before calling mce:api/run/as"
-execute unless entity @e[tag=mce.executor,limit=1] run data modify storage mce:error Code set value "ERR_NO_EXECUTOR"
-execute unless entity @e[tag=mce.executor,limit=1] run function mce:core/error/raise
-execute unless entity @e[tag=mce.executor,limit=1] run return 0
+execute unless entity @e[tag=mce.executor,limit=1] if data storage mce:cmd Command run data modify storage mce:error Last set value "no entity tagged mce.executor — tag a target before calling mce:api/run/as"
+execute unless entity @e[tag=mce.executor,limit=1] if data storage mce:cmd Command run data modify storage mce:error Code set value "ERR_NO_EXECUTOR"
+execute unless entity @e[tag=mce.executor,limit=1] if data storage mce:cmd Command run function mce:core/error/raise
 
-function mce:core/run/as_exec
+execute if data storage mce:cmd Command if entity @e[tag=mce.executor,limit=1] run function mce:core/run/as_exec
