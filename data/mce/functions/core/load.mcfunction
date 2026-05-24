@@ -39,7 +39,7 @@ data modify storage mce:config mce.queue_interval set value 3
 execute unless data storage mce:config api.announce_default_preset run data modify storage mce:config api.announce_default_preset set value "normal"
 
 # --- LanternLoad: advertise MCE version ---
-# v2.2.0 -> 2001100
-scoreboard players set #mce load.status 2001100
+# v2.2.0 -> 2002000
+scoreboard players set #mce load.status 2002000
 
 tellraw @a ["",{"text":"[MCE] ","color":"aqua"},{"text":"Marker Command Engine v2.2.0 loaded!","color":"white"}]
