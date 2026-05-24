@@ -26,7 +26,7 @@ data modify storage mce:error Count set value 0
 execute unless data storage mce:config {mce:{debug:1b}} run data modify storage mce:config mce.debug set value 0b
 
 # mce.version: human-readable version string (set on every load)
-data modify storage mce:config mce.version set value "2.2.0"
+data modify storage mce:config mce.version set value "2.3.0"
 
 # mce.queue_interval: ticks between queue executions (read-only reference, hardcoded in core/queue/tick)
 data modify storage mce:config mce.queue_interval set value 3
@@ -40,6 +40,6 @@ execute unless data storage mce:config api.announce_default_preset run data modi
 
 # --- LanternLoad: advertise MCE version ---
 # v2.2.0 -> 2002000
-scoreboard players set #mce load.status 2002000
+scoreboard players set #mce load.status 2003000
 
-tellraw @a ["",{"text":"[MCE] ","color":"aqua"},{"text":"Marker Command Engine v2.2.0 loaded!","color":"white"}]
+tellraw @a ["",{"text":"[MCE] ","color":"aqua"},{"text":"Marker Command Engine v2.3.0 loaded!","color":"white"}]
