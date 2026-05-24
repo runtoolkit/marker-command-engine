@@ -1,5 +1,5 @@
 # PUBLIC API — mce:api/util/error_clear
-# MCE version: 2.1.1
+# MCE version: 2.2.0
 #
 # Resets the MCE error state: clears mce:error Last, Code, and Count,
 # and resets the internal error counter scoreboard.
