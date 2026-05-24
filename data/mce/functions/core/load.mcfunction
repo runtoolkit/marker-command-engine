@@ -7,11 +7,14 @@ scoreboard objectives add mce.queue dummy
 scoreboard objectives add mce.tick dummy
 scoreboard objectives add mce.compat dummy
 scoreboard objectives add mce.cd dummy
+scoreboard objectives add mce.log dummy
 
 scoreboard players set #tick mce.tick 0
 scoreboard players set #queue.active mce.compat 0
 scoreboard players set #sched.exists mce.compat 0
 scoreboard players set #error.count mce.queue 0
+scoreboard players set #log.n mce.log 0
+scoreboard players set #log.size mce.log 0
 data remove storage mce:error Last
 data remove storage mce:error Code
 data modify storage mce:error Count set value 0
