@@ -2,9 +2,8 @@
 # MCE version: 2.2.0
 #
 # Prints all current log entries to the caller (@s) via tellraw.
-# Each entry is displayed as: [#n] [LEVEL] message
-# Colors: INFO = white, WARN = yellow, ERROR = red.
-# If the log is empty, prints a notice instead.
+# Each entry: [#n] [LEVEL]  message
+# Colors: INFO=white  WARN=yellow  ERROR=red
 # Macro-free. Compatible with Minecraft 1.19.3+.
 #
 # Usage:
@@ -17,8 +16,9 @@ execute if score #log.size mce.log matches 0 run return 0
 
 tellraw @s ["",{"text":"=== MCE Log (","color":"gold"},{"score":{"name":"#log.size","objective":"mce.log"}},{"text":" entries) ===","color":"gold"}]
 
-# Copy entries to iteration workspace (preserves originals)
+# Copy to iteration scratch (preserves originals)
 data modify storage mce:log_iter entries set from storage mce:log entries
 
 function mce:core/log/show_iter
-data remove storage mce:log_iter
+
+data remove storage mce:log_iter entries
