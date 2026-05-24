@@ -1,6 +1,6 @@
-# Marker Command Engine (MCE)
+# Marker Command Engine - Macro-free Command Framework
 
-[![Minecraft](https://img.shields.io/badge/Minecraft-1.19.3--26.1.2-green)](https://minecraft.net)
+[![Minecraft](https://img.shields.io/badge/Minecraft-1.20--26.1.2-green)](https://minecraft.net)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![LanternLoad](https://img.shields.io/badge/LanternLoad-compatible-blue)](https://github.com/LanternMC/load)
 
