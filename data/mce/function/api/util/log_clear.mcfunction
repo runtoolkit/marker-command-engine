@@ -1,14 +1,13 @@
 # PUBLIC API — mce:api/util/log_clear
-# MCE version: 2.1.1
+# MCE version: 2.2.0
 #
-# Clears the command log stored in mce:log entries.
-# Use when you want to reset audit history (e.g. after a session ends).
-# Macro-free. Compatible with Minecraft 1.19.3+.
+# DEPRECATED — use mce:api/log/clear instead.
+# This function is kept for backwards compatibility only.
 #
-# Output:
-#   mce:log entries — cleared (empty list)
-#
-# Usage:
+# Usage (legacy):
 #   function mce:api/util/log_clear
+#
+# Preferred:
+#   function mce:api/log/clear
 
-data remove storage mce:log entries
+function mce:api/log/clear

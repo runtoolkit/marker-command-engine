@@ -1,24 +1,26 @@
 # PUBLIC API — mce:api/util/log
-# MCE version: 2.0.1 (extended)
+# MCE version: 2.2.0
 #
-# Appends the current mce:cmd Command value to an in-memory log list
-# (mce:log entries). Useful for audit trails or debug history.
-# Macro-free. Compatible with Minecraft 1.19.3+.
+# DEPRECATED — use mce:api/log/write instead.
+# This function is kept for backwards compatibility only.
+# It will be removed in a future major version.
 #
-# The log holds the last 10 entries. Older entries are dropped automatically.
+# Appends mce:cmd Command to the log as an INFO entry.
+# Wraps mce:api/log/write internally.
 #
-# Input:
-#   mce:cmd Command — string, the command string to log (required)
+# Usage (legacy):
+#   data modify storage mce:cmd Command set value "some command"
+#   function mce:api/util/log
 #
-# Output:
-#   mce:log entries — list of strings (last 10 commands logged)
+# Preferred:
+#   data modify storage mce:log_write msg set value "some command"
+#   function mce:api/log/write
 
 execute unless data storage mce:cmd Command run data modify storage mce:error Last set value "mce:cmd Command is not set — nothing to log"
 execute unless data storage mce:cmd Command run data modify storage mce:error Code set value "ERR_NO_CMD"
 execute unless data storage mce:cmd Command run function mce:core/error/raise
 execute unless data storage mce:cmd Command run return 0
 
-data modify storage mce:log entries append from storage mce:cmd Command
-
-execute store result score #log.size mce.queue run data get storage mce:log entries
-execute if score #log.size mce.queue matches 11.. run data remove storage mce:log entries[0]
+data modify storage mce:log_write msg set from storage mce:cmd Command
+data modify storage mce:log_write level set value "INFO"
+function mce:api/log/write
