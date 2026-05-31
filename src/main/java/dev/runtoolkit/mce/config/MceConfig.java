@@ -2,6 +2,7 @@ package dev.runtoolkit.mce.config;
 
 import com.google.gson.*;
 import dev.runtoolkit.mce.MarkerCommandEngine;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.server.MinecraftServer;
 
 import java.io.*;
@@ -10,30 +11,8 @@ import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Parses {@code config/marker-command-engine/commands.json}.
- *
- * <p>Structure:
- * <pre>
- * {
- *   "settings": {
- *     "require_op_level": 2,
- *     "log_executions": true,
- *     "allowed_datapacks": []   // empty = all datapacks allowed
- *   },
- *   "denylist": {
- *     "prefixes": ["op", "deop", ...],
- *     "patterns": [".*regex.*"]
- *   },
- *   "commands": [
- *     { "id": "...", "command": "...", "run_as": "console", "enabled": true }
- *   ]
- * }
- * </pre>
- */
 public class MceConfig {
 
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final String CONFIG_FILENAME = "commands.json";
 
     private Path configPath;
@@ -45,10 +24,10 @@ public class MceConfig {
 
     private MceConfig() {}
 
-    /** Load from {@code config/marker-command-engine/commands.json}. Creates defaults if absent. */
     public static MceConfig load() {
         MceConfig cfg = new MceConfig();
-        Path dir = Path.of("config", "marker-command-engine");
+        // FabricLoader guarantees the correct config dir regardless of working directory
+        Path dir = FabricLoader.getInstance().getConfigDir().resolve("marker-command-engine");
         cfg.configPath = dir.resolve(CONFIG_FILENAME);
 
         try {
@@ -63,10 +42,10 @@ public class MceConfig {
         return cfg;
     }
 
-    /** Called on server start — re-parses the file from disk. */
     public void reload(MinecraftServer server) {
         try {
             parse();
+            MarkerCommandEngine.LOGGER.info("[MCE] Reloaded from {}", configPath.toAbsolutePath());
         } catch (Exception e) {
             MarkerCommandEngine.LOGGER.error("[MCE] Reload failed: {}", e.getMessage());
         }
@@ -77,7 +56,6 @@ public class MceConfig {
             if (in != null) {
                 Files.copy(in, configPath, StandardCopyOption.REPLACE_EXISTING);
             } else {
-                // Write a minimal default
                 String defaults = """
                         {
                           "settings": { "require_op_level": 2, "log_executions": true, "allowed_datapacks": [] },
@@ -91,67 +69,56 @@ public class MceConfig {
                 Files.writeString(configPath, defaults, StandardCharsets.UTF_8);
             }
         }
-        MarkerCommandEngine.LOGGER.info("[MCE] Created default commands.json at {}", configPath);
+        MarkerCommandEngine.LOGGER.info("[MCE] Created default commands.json at {}", configPath.toAbsolutePath());
     }
 
     private void parse() throws IOException {
         String raw = Files.readString(configPath, StandardCharsets.UTF_8);
         JsonObject root = JsonParser.parseString(raw).getAsJsonObject();
 
-        // settings
         if (root.has("settings")) {
             JsonObject settings = root.getAsJsonObject("settings");
-            requireOpLevel  = settings.has("require_op_level") ? settings.get("require_op_level").getAsInt() : 2;
-            logExecutions   = !settings.has("log_executions") || settings.get("log_executions").getAsBoolean();
+            requireOpLevel = settings.has("require_op_level") ? settings.get("require_op_level").getAsInt() : 2;
+            logExecutions  = !settings.has("log_executions") || settings.get("log_executions").getAsBoolean();
             allowedDatapacks = new ArrayList<>();
             if (settings.has("allowed_datapacks")) {
-                for (JsonElement el : settings.getAsJsonArray("allowed_datapacks")) {
+                for (JsonElement el : settings.getAsJsonArray("allowed_datapacks"))
                     allowedDatapacks.add(el.getAsString());
-                }
             }
         }
 
-        // denylist
         List<String> prefixes = new ArrayList<>();
         List<String> patterns = new ArrayList<>();
         if (root.has("denylist")) {
             JsonObject dl = root.getAsJsonObject("denylist");
-            if (dl.has("prefixes")) {
+            if (dl.has("prefixes"))
                 for (JsonElement el : dl.getAsJsonArray("prefixes")) prefixes.add(el.getAsString());
-            }
-            if (dl.has("patterns")) {
+            if (dl.has("patterns"))
                 for (JsonElement el : dl.getAsJsonArray("patterns")) patterns.add(el.getAsString());
-            }
         }
         denylist = new Denylist(prefixes, patterns);
 
-        // commands
         commands = new ArrayList<>();
         if (root.has("commands")) {
             for (JsonElement el : root.getAsJsonArray("commands")) {
                 JsonObject obj = el.getAsJsonObject();
-                // Skip comment-only entries
                 if (!obj.has("id") || !obj.has("command")) continue;
                 String id      = obj.get("id").getAsString();
                 String cmd     = obj.get("command").getAsString();
                 String runAs   = obj.has("run_as") ? obj.get("run_as").getAsString() : "console";
                 boolean enabled = !obj.has("enabled") || obj.get("enabled").getAsBoolean();
-                if (enabled) {
-                    commands.add(new CommandEntry(id, cmd, runAs, true));
-                }
+                if (enabled) commands.add(new CommandEntry(id, cmd, runAs, true));
             }
         }
 
-        MarkerCommandEngine.LOGGER.info("[MCE] Config parsed: op_level={}, denylist_prefixes={}, commands={}",
-                requireOpLevel, prefixes.size(), commands.size());
+        MarkerCommandEngine.LOGGER.info("[MCE] Config loaded from {}: op_level={}, denylist={}, commands={}",
+                configPath.toAbsolutePath(), requireOpLevel, prefixes.size(), commands.size());
     }
 
-    // ── Accessors ─────────────────────────────────────────────────────────────
-
-    public int getRequireOpLevel()        { return requireOpLevel; }
-    public boolean isLogExecutions()      { return logExecutions; }
+    public int getRequireOpLevel()           { return requireOpLevel; }
+    public boolean isLogExecutions()         { return logExecutions; }
     public List<String> getAllowedDatapacks() { return allowedDatapacks; }
-    public Denylist getDenylist()         { return denylist; }
-    public List<CommandEntry> getCommands() { return commands; }
-    public Path getConfigPath()           { return configPath; }
+    public Denylist getDenylist()            { return denylist; }
+    public List<CommandEntry> getCommands()  { return commands; }
+    public Path getConfigPath()              { return configPath; }
 }
