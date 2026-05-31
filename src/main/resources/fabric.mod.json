@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "id": "marker-command-engine",
+  "version": "${version}",
+  "name": "Marker Command Engine",
+  "description": "Fabric port of MCE — /marker-command-engine (/mce) with commands.json config, denylist, and event system.",
+  "authors": ["runtoolkit"],
+  "contact": {
+    "sources": "https://github.com/runtoolkit/marker-command-engine"
+  },
+  "license": "MIT",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "dev.runtoolkit.mce.MarkerCommandEngine"
+    ]
+  },
+  "mixins": [],
+  "depends": {
+    "fabricloader": ">=0.15.0",
+    "minecraft": "~1.20.6",
+    "java": ">=21",
+    "fabric-api": "*"
+  }
+}

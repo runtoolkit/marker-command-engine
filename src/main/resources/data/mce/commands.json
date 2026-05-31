@@ -1,0 +1,42 @@
+{
+  "_comment": "Marker Command Engine — commands.json",
+  "_doc": "https://github.com/runtoolkit/marker-command-engine#commandsjson",
+
+  "settings": {
+    "require_op_level": 2,
+    "log_executions": true,
+    "allowed_datapacks": []
+  },
+
+  "denylist": {
+    "_comment": "Commands listed here will be rejected before execution. Prefix matching: 'op' blocks 'op', 'op SomeName', etc.",
+    "prefixes": [
+      "op",
+      "deop",
+      "ban",
+      "ban-ip",
+      "pardon",
+      "pardon-ip",
+      "stop",
+      "whitelist add",
+      "whitelist remove",
+      "data merge entity @",
+      "data modify entity @"
+    ],
+    "patterns": [
+      ".*\\$\\{.*\\}.*",
+      ".*`.*`.*"
+    ],
+    "_patterns_note": "Java regex. Block prompt-injection style substitution patterns."
+  },
+
+  "commands": [
+    {
+      "_comment": "Example: run a say command as console",
+      "id": "test_command",
+      "command": "say Hello from MCE!",
+      "run_as": "console",
+      "enabled": false
+    }
+  ]
+}
