@@ -12,27 +12,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Runtime configuration parsed from {@code data/mce/commands.json}.
- *
- * <h2>Loading strategy</h2>
- * <ol>
- *   <li>{@link #load()} — reads the bundled JAR classpath resource during mod init
- *       (before any server is available). Gives sensible defaults immediately.</li>
- *   <li>{@link #reload(MinecraftServer)} — re-reads via
- *       {@code server.getResourceManager()}, which resolves {@code data/mce/commands.json}
- *       across all active data packs. A data pack that provides this file at
- *       {@code data/mce/commands.json} overrides the bundled defaults.</li>
- * </ol>
- *
- * <p>The config intentionally does <em>not</em> live in {@code .minecraft/config/}.
- * It is a data-level file so server-pack authors can ship and override it without
- * touching the mod JAR.
- */
 public class MceConfig {
 
-    /** Identifier used to locate the config in the ResourceManager: data/mce/commands.json */
-    private static final Identifier CONFIG_ID = Identifier.of("mce", "commands.json");
+    private static final Identifier CONFIG_ID = new Identifier("mce", "commands.json");
 
     private int requireOpLevel = 2;
     private boolean logExecutions = true;
@@ -42,13 +24,6 @@ public class MceConfig {
 
     private MceConfig() {}
 
-    // ── Public API ────────────────────────────────────────────────────────────
-
-    /**
-     * Initial load from the bundled {@code /data/mce/commands.json} classpath resource.
-     * Called once during mod init before any server is available.
-     * The result is replaced by {@link #reload(MinecraftServer)} on server start.
-     */
     public static MceConfig load() {
         MceConfig cfg = new MceConfig();
         try (InputStream in = MceConfig.class.getResourceAsStream("/data/mce/commands.json")) {
@@ -63,25 +38,12 @@ public class MceConfig {
         return cfg;
     }
 
-    /**
-     * Reload from the server's ResourceManager.
-     *
-     * <p>Resolution order (highest priority first):
-     * <ol>
-     *   <li>Loaded data packs that provide {@code data/mce/commands.json}</li>
-     *   <li>The bundled mod JAR (Fabric registers it as a built-in data pack)</li>
-     * </ol>
-     *
-     * <p>This is the correct call site for {@code /mce reload}: the server
-     * parameter is <em>not</em> optional — it provides the ResourceManager that
-     * knows which data packs are active.
-     */
     public void reload(MinecraftServer server) {
         Optional<Resource> resource = server.getResourceManager().getResource(CONFIG_ID);
         if (resource.isPresent()) {
             try (InputStream in = resource.get().getInputStream()) {
                 String content = new String(in.readAllBytes(), StandardCharsets.UTF_8);
-                String source  = resource.get().getResourcePackName();
+                String source  = resource.get().getPack().getInfo().id();
                 parseContent(content, "resource manager [pack: " + source + "]");
             } catch (Exception e) {
                 MarkerCommandEngine.LOGGER.error("[MCE] Reload failed: {}", e.getMessage());
@@ -93,15 +55,11 @@ public class MceConfig {
         }
     }
 
-    // ── Getters ───────────────────────────────────────────────────────────────
-
     public int getRequireOpLevel()           { return requireOpLevel; }
     public boolean isLogExecutions()         { return logExecutions; }
     public List<String> getAllowedDatapacks() { return allowedDatapacks; }
     public Denylist getDenylist()            { return denylist; }
     public List<CommandEntry> getCommands()  { return commands; }
-
-    // ── Internal ──────────────────────────────────────────────────────────────
 
     private void parseContent(String raw, String source) {
         JsonObject root = JsonParser.parseString(raw).getAsJsonObject();
@@ -137,7 +95,6 @@ public class MceConfig {
                 String  runAs   = obj.has("run_as") ? obj.get("run_as").getAsString() : "console";
                 boolean enabled = !obj.has("enabled") || obj.get("enabled").getAsBoolean();
 
-                // "commands" array takes priority over legacy "command" string
                 List<String> cmds = new ArrayList<>();
                 if (obj.has("commands") && obj.get("commands").isJsonArray()) {
                     for (JsonElement ce : obj.getAsJsonArray("commands")) {
