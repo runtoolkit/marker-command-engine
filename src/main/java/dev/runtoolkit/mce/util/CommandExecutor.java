@@ -2,15 +2,19 @@ package dev.runtoolkit.mce.util;
 
 import dev.runtoolkit.mce.MarkerCommandEngine;
 import dev.runtoolkit.mce.config.MceConfig;
-import dev.runtoolkit.mce.event.MceEvent;
 import dev.runtoolkit.mce.event.MceEventBus;
+import dev.runtoolkit.mce.storage.StoragePlaceholderResolver;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 
 /**
- * Executes a command string through the Minecraft server dispatcher,
- * after applying denylist checks.
+ * Executes a command string through the Minecraft server dispatcher after:
+ * <ol>
+ *   <li>Denylist check on the raw template string</li>
+ *   <li>Placeholder resolution ({@code %ns:path="key"%} → storage value)</li>
+ *   <li>Denylist re-check on the expanded string (injection protection)</li>
+ * </ol>
  *
  * <p>This replaces the datapack command-block tunnel entirely.
  * No marker entities, no forceloaded chunks, no command blocks.
@@ -28,7 +32,10 @@ public final class CommandExecutor {
      *   <li>Otherwise it runs as {@code callerSource} (preserving the player's permission level).</li>
      * </ul>
      *
-     * @return {@code true} if the command was dispatched; {@code false} if denied or failed.
+     * @param command      Raw command string (with or without leading '/').
+     *                     May contain {@code %ns:path="key"%} storage placeholders.
+     * @param runAsConsole If true, execute as server console source (op-level 4).
+     * @return {@code true} if the command was dispatched without exception; {@code false} if denied or failed.
      */
     public static boolean execute(
             MinecraftServer server,
@@ -39,21 +46,37 @@ public final class CommandExecutor {
             MceEventBus eventBus
     ) {
         // Strip leading slash for consistency
-        String normalized = command.startsWith("/") ? command.substring(1) : command;
+        String template = command.startsWith("/") ? command.substring(1) : command;
 
-        // Denylist check
-        String denialReason = config.getDenylist().denialReason(normalized);
-        if (denialReason != null) {
-            eventBus.fireDenied(callerSource, normalized, denialReason);
+        // Phase 1 — denylist check on the raw template (catches static violations before any I/O)
+        String rawDenial = config.getDenylist().denialReason(template);
+        if (rawDenial != null) {
+            eventBus.fireDenied(callerSource, template, rawDenial);
             callerSource.sendFeedback(
-                    () -> Text.literal("[MCE] Command denied: " + denialReason),
+                    () -> Text.literal("[MCE] Command denied: " + rawDenial),
                     false
             );
             MarkerCommandEngine.LOGGER.warn("[MCE] DENIED '{}' for {}: {}",
-                    normalized,
-                    callerSource.getName(),
-                    denialReason);
+                    template, callerSource.getName(), rawDenial);
             return false;
+        }
+
+        // Phase 2 — resolve %ns:path="key"% storage placeholders
+        String expanded = StoragePlaceholderResolver.resolve(template, server);
+
+        // Phase 3 — post-expansion denylist re-check (prevents storage injection attacks)
+        if (!expanded.equals(template)) {
+            String expandedDenial = config.getDenylist().denialReason(expanded);
+            if (expandedDenial != null) {
+                eventBus.fireDenied(callerSource, expanded, expandedDenial);
+                callerSource.sendFeedback(
+                        () -> Text.literal("[MCE] Command denied after expansion: " + expandedDenial),
+                        false
+                );
+                MarkerCommandEngine.LOGGER.warn("[MCE] DENIED (post-expansion) '{}' → '{}' for {}: {}",
+                        template, expanded, callerSource.getName(), expandedDenial);
+                return false;
+            }
         }
 
         // Select execution source
@@ -63,22 +86,30 @@ public final class CommandExecutor {
 
         // Log if configured
         if (config.isLogExecutions()) {
-            MarkerCommandEngine.LOGGER.info("[MCE] EXEC '{}' by {} (runAsConsole={})",
-                    normalized, callerSource.getName(), runAsConsole);
+            if (expanded.equals(template)) {
+                MarkerCommandEngine.LOGGER.info("[MCE] EXEC '{}' by {} (runAsConsole={})",
+                        expanded, callerSource.getName(), runAsConsole);
+            } else {
+                MarkerCommandEngine.LOGGER.info("[MCE] EXEC '{}' → '{}' by {} (runAsConsole={})",
+                        template, expanded, callerSource.getName(), runAsConsole);
+            }
         }
 
-        eventBus.fireAllowed(callerSource, normalized);
+        eventBus.fireAllowed(callerSource, expanded);
 
+        boolean dispatched = false;
         try {
-            server.getCommandManager().getDispatcher().execute(normalized, execSource);
-            return true;
+            server.getCommandManager().getDispatcher().execute(expanded, execSource);
+            dispatched = true;
         } catch (Exception e) {
             callerSource.sendFeedback(
                     () -> Text.literal("[MCE] Execution error: " + e.getMessage()),
                     false
             );
-            MarkerCommandEngine.LOGGER.error("[MCE] Execution error for '{}': {}", normalized, e.getMessage());
-            return false;
+            MarkerCommandEngine.LOGGER.error("[MCE] Execution error for '{}': {}", expanded, e.getMessage());
+        } finally {
+            eventBus.fireExecuted(callerSource, expanded, dispatched);
         }
+        return dispatched;
     }
 }

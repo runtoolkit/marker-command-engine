@@ -32,11 +32,45 @@
 
   "commands": [
     {
-      "_comment": "Example: run a say command as console",
+      "_comment": "Single command with aliases. /mce run-id test OR /mce run-id t OR /mce run-id tc",
       "id": "test_command",
+      "aliases": ["test", "tc"],
       "command": "say Hello from MCE!",
       "run_as": "console",
       "enabled": true
+    },
+    {
+      "_comment": "Multi-command sequence (1.0.1). All commands run in order; sequence aborts on first failure.",
+      "id": "multi_example",
+      "aliases": ["multi"],
+      "commands": [
+        "say [MCE] Step 1 — starting sequence",
+        "say [MCE] Step 2 — middle",
+        "say [MCE] Step 3 — done"
+      ],
+      "run_as": "console",
+      "enabled": false
+    },
+    {
+      "_comment": "Storage placeholder: reads mce:vars.player_name from command storage at execution time.",
+      "_comment2": "Set from a datapack: data modify storage mce:vars player_name set value \"Legends11\"",
+      "id": "greet_player",
+      "aliases": ["greet", "gp"],
+      "command": "say Welcome %mce:vars=\"player_name\"%!",
+      "run_as": "console",
+      "enabled": false
+    },
+    {
+      "_comment": "Multi-command with placeholders. Reads two separate storage keys.",
+      "id": "announce_event",
+      "aliases": ["announce"],
+      "commands": [
+        "title @a title {\"text\":\"%mce:event=\"title\"%\",\"bold\":true}",
+        "title @a subtitle {\"text\":\"%mce:event=\"subtitle\"%\"}",
+        "playsound minecraft:ui.toast.challenge_complete master @a"
+      ],
+      "run_as": "console",
+      "enabled": false
     }
   ]
 }

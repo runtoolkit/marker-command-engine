@@ -60,14 +60,24 @@ public class MceEventBus {
     // ── Convenience fire methods ───────────────────────────────────────────────
 
     public void fireAllowed(ServerCommandSource source, String command) {
-        fire(MceEvent.COMMAND_ALLOWED, new MceEventContext(source, command, null));
+        fire(MceEvent.COMMAND_ALLOWED, new MceEventContext(source, command, null, null));
     }
 
     public void fireDenied(ServerCommandSource source, String command, String reason) {
-        fire(MceEvent.COMMAND_DENIED, new MceEventContext(source, command, reason));
+        fire(MceEvent.COMMAND_DENIED, new MceEventContext(source, command, reason, null));
+    }
+
+    /**
+     * Fire {@link MceEvent#COMMAND_EXECUTED} after a dispatch attempt.
+     *
+     * @param success {@code true} if the dispatcher ran without exception;
+     *                {@code false} if execution threw.
+     */
+    public void fireExecuted(ServerCommandSource source, String command, boolean success) {
+        fire(MceEvent.COMMAND_EXECUTED, new MceEventContext(source, command, null, success));
     }
 
     public void fireConfigReloaded() {
-        fire(MceEvent.CONFIG_RELOADED, new MceEventContext(null, null, null));
+        fire(MceEvent.CONFIG_RELOADED, new MceEventContext(null, null, null, null));
     }
 }
