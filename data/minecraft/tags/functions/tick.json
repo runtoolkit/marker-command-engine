@@ -1,6 +1,7 @@
 {
     "values": [
         "mce:core/schedule/tick",
-        "mce:core/cooldown/tick"
+        "mce:core/cooldown/tick",
+        "mce:core/load/tick"
     ]
 }
