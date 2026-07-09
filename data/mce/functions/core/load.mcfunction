@@ -19,6 +19,16 @@ data remove storage mce:error Last
 data remove storage mce:error Code
 data modify storage mce:error Count set value 0
 
+# --- List-type storage init ---
+# Prevents "data get" errors on fresh worlds where these paths have never
+# been written to yet. Guarded so a /reload never wipes an in-flight queue,
+# schedule, log, or batch.
+execute unless data storage mce:queue commands run data modify storage mce:queue commands set value []
+execute unless data storage mce:schedule jobs run data modify storage mce:schedule jobs set value []
+execute unless data storage mce:log entries run data modify storage mce:log entries set value []
+execute unless data storage mce:text_batch entries run data modify storage mce:text_batch entries set value []
+execute unless data storage mce:batch commands run data modify storage mce:batch commands set value []
+
 # --- MCE Config (mce.*) ---
 # Internal MCE settings. Do not modify unless you know what you are doing.
 
@@ -30,6 +40,11 @@ data modify storage mce:config mce.version set value "2.3.0"
 
 # mce.queue_interval: ticks between queue executions (read-only reference, hardcoded in core/queue/tick)
 data modify storage mce:config mce.queue_interval set value 3
+
+# mce.track_output: whether spawned command blocks set TrackOutput (1b = default/on,
+# matches prior behavior; 0b = silent, skips the per-command output broadcast to ops
+# when commandBlockOutput gamerule is on). Does not affect command execution itself.
+execute unless data storage mce:config mce.track_output run data modify storage mce:config mce.track_output set value 1b
 
 # --- API Config (api.*) ---
 # Settings exposed for other packs to read and optionally override.

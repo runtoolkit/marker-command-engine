@@ -18,7 +18,7 @@ execute as @e[type=minecraft:marker,tag=mce.cmd,limit=1] store result entity @s 
 setblock 0 -64 0 minecraft:command_block replace
 data modify block 0 -64 0 Command set value ""
 data modify block 0 -64 0 auto set value 0b
-data modify block 0 -64 0 TrackOutput set value 1b
+data modify block 0 -64 0 TrackOutput set from storage mce:config mce.track_output
 
 execute at @e[type=minecraft:marker,tag=mce.cmd,limit=1] run data modify block 0 -64 0 Command set from storage mce:cmd Command
 execute at @e[type=minecraft:marker,tag=mce.cmd,limit=1] run data modify block 0 -64 0 auto set value 1b
