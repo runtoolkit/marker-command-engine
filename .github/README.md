@@ -4,11 +4,6 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![LanternLoad](https://img.shields.io/badge/LanternLoad-compatible-blue)](https://github.com/LanternMC/load)
 
----
-> A trusted command runtime/dependency framework for datapacks.
-> Not designed as a sandbox. Use only with trusted packs and operators.
----
-
 **Marker Command Engine** is a lightweight command execution engine for Minecraft datapacks. It runs commands stored in NBT storage using a marker entity + command block technique, with full LanternLoad integration for reliable load ordering.
 
 ## Features
