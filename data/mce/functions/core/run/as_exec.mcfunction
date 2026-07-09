@@ -3,6 +3,8 @@
 # The caller is responsible for tagging the target before calling mce:api/run/as.
 # The mce.executor tag is removed from all entities after execution.
 
+data modify storage mce:temp mode set value "run_as"
+
 function mce:core/run/setup_marker
 
 setblock 0 -64 0 minecraft:command_block replace
@@ -15,8 +17,5 @@ execute at @e[type=minecraft:marker,tag=mce.cmd,limit=1] run data modify block 0
 
 # Trigger the block from each executor entity's position and as that entity
 execute as @e[tag=mce.executor] at @s run data modify block 0 -64 0 auto set value 1b
-
-tag @e remove mce.executor
-data remove storage mce:cmd Command
 
 schedule function mce:core/run/reset 3t replace
