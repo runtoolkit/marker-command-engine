@@ -57,4 +57,5 @@ execute unless data storage mce:config api.announce_default_preset run data modi
 # v2.2.0 -> 2002000
 scoreboard players set #mce load.status 2003000
 
+scoreboard objectives remove loadMCE
 tellraw @a ["",{"text":"[MCE] ","color":"aqua"},{"text":"Marker Command Engine v2.3.0 loaded!","color":"white"}]
