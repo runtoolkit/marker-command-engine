@@ -80,3 +80,9 @@ jobs:
             echo "$BAD"
           fi
           echo "forceload check done."
+
+
+      - name: Mecha lint
+        run: |
+         pip install mecha
+         mecha .
