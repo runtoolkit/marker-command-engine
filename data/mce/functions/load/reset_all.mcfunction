@@ -1,10 +1,7 @@
 # Objectives
-scoreboard objectives add mce.queue dummy
-scoreboard objectives add mce.tick dummy
-scoreboard objectives add mce.compat dummy
-scoreboard objectives add mce.cd dummy
-scoreboard objectives add mce.log dummy
-scoreboard objectives add loadMCE
+scoreboard objectives remove mce.queue
+scoreboard objectives remove mce.log
+scoreboard objectives remove loadMCE
 scoreboard players reset #tick mce.tick
 scoreboard players reset #queue.active mce.compat
 scoreboard players reset #sched.exists mce.compat
@@ -24,4 +21,5 @@ data remove storage mce:config mce.track_output
 data remove storage mce:config api.announce_default_preset
 
 # Debug / Tellraw
+scoreboard objectives add loadMCE trigger
 tellraw @a ["",{"text":"[MCE] ","color":"aqua"},{"text":"Marker Command Engine v2.3.0 reseted!","color":"yellow"}]
