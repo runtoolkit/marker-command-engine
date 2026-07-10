@@ -21,3 +21,13 @@ rad.json
 *.flf
 #Test results file
 TestResults.xml
+
+# Cache
+usercache.json
+
+# Minecraft
+./
+saves/
+ops.json
+whitelist.json
+world/data/*.dat
