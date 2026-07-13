@@ -20,4 +20,4 @@ data modify storage mce:output List.Length.result set value 0
 execute if data storage mce:lib_list Values store result storage mce:output List.Length.result int 1 run data get storage mce:lib_list Values
 
 data modify storage mce:output List.IsEmpty.result set value 0b
-execute if data storage mce:output{List:{Length:{result:0}}} run data modify storage mce:output List.IsEmpty.result set value 1b
+execute if data storage mce:output {List:{Length:{result:0}}} run data modify storage mce:output List.IsEmpty.result set value 1b
