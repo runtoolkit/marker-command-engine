@@ -24,4 +24,4 @@ data modify storage mce:output String.IsEmpty.set set value 0b
 execute if data storage mce:lib_string Value run data modify storage mce:output String.IsEmpty.set set value 1b
 
 data modify storage mce:output String.IsEmpty.result set value 0b
-execute if data storage mce:lib_string{Value:""} run data modify storage mce:output String.IsEmpty.result set value 1b
+execute if data storage mce:lib_string {Value:""} run data modify storage mce:output String.IsEmpty.result set value 1b
